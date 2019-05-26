@@ -45,6 +45,23 @@ class App extends Component {
     }
   }
 
+  toggleSign = () => {
+    const { operations } = this.state;
+    console.log(operations)
+    this.setState({
+      operations: operations.charAt(0) === '-' ? operations.substr(1) : '-' + operations
+    })
+  }
+
+  inputPercent = () => {
+    const { operations } = this.state
+    const value = parseFloat(operations)
+    this.setState({
+      operations: String(value / 100)
+    })
+  }
+
+
 
   render() {
     return (
@@ -53,7 +70,7 @@ class App extends Component {
         <Buttons>
           <Button onClick={this.handleClick} label="AC" value="clear" />
           <Button onClick={this.toggleSign} label="+-" value="toggle" />
-          <Button onClick={this.handleClick} label="%" value="percent" />
+          <Button onClick={this.inputPercent} label="%" value="percent" />
           <Button onClick={this.handleClick} label="+" value="+" />
 
           <Button onClick={this.handleClick} label="1" value="1" />
