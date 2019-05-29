@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from 'react'
+import "./App.css";
 import Display from './components/Display'
 import Buttons from './components/Buttons'
 import Button from './components/Button'
@@ -7,7 +7,7 @@ import update from 'immutability-helper'
 import math from 'mathjs'
 
 class App extends Component {
-  state = { calculations: [0] }
+  state = { operations: ['0'] }
 
   handleClick = e => {
     // console.log(e)
@@ -23,24 +23,37 @@ class App extends Component {
         this.calculateOperations()
         break
       default:
-        const calculations = update(this.state.calculations, {
-          $push: [value],
-        })
-        this.setState({
-          calculations: this.state.calculations === 0 ? [value] : calculations,
-        })
+        if (this.state.operations[0] === '0') {
+          this.setState({
+            operations: [],
+          }, () => {
+            this.updatecalc(value)
+          })
+        }
+        else {
+          this.updatecalc(value)
+        }
         break
     }
   }
 
+  updatecalc = (value) => {
+    const newOperations = update(this.state.operations, {
+      $push: [value],
+    })
+    this.setState({
+      operations: this.state.operations === 0 ? [value] : newOperations,
+    })
+  }
+
   calculateOperations = () => {
-    let finalResult = this.state.calculations.join('')
+    let finalResult = this.state.operations.join('')
     if (finalResult) {
       finalResult = math.eval(finalResult)
       finalResult = math.format(finalResult, { precision: 14 })
       finalResult = String(finalResult)
       this.setState({
-        calculations: [finalResult],
+        operations: [finalResult],
       })
     }
   }
@@ -48,25 +61,25 @@ class App extends Component {
   toggleSign = () => {
     const { operations } = this.state;
     console.log(operations)
+    const signOperation = operations.filter(number =>
+      number.charAt(0) === '-' ? number.substr(1) : '-' + number)
     this.setState({
-      operations: operations.charAt(0) === '-' ? operations.substr(1) : '-' + operations
+      operations: signOperation,
     })
   }
 
   inputPercent = () => {
     const { operations } = this.state
-    const value = parseFloat(operations)
+    let value = operations.join('')
     this.setState({
-      operations: String(value / 100)
+      operations: [parseFloat(value / 100).toFixed(2)]
     })
   }
 
-
-
   render() {
     return (
-      <div className="App" >
-        <Display data={this.state.calculations} />
+      <div className="App">
+        <Display data={this.state.operations} />
         <Buttons>
           <Button onClick={this.handleClick} label="AC" value="clear" />
           <Button onClick={this.toggleSign} label="+-" value="toggle" />
@@ -92,7 +105,7 @@ class App extends Component {
           <Button onClick={this.handleClick} label="." value="." />
           <Button onClick={this.handleClick} label="=" size="1" value="equal" />
         </Buttons>
-      </div >
+      </div>
     );
   }
 }
